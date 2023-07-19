@@ -1,0 +1,99 @@
+<html>
+  <body>
+    <form>
+      <input id="in" type="text" />
+      <input type="reset" /><br/>
+      <label>Length of Target: </label>
+      <input id="len"/ value="2" type="Number" min="1"><br/>
+      <label>Number of dice </label>
+      <input id="dice"/ value="5" type="Number" min="1">
+    </form>
+    <p id="ans"></p>
+    <script>
+     function computeWithOperations(target,nums){
+        const cartesian =
+  (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+  const permutator = (inputArr) => {
+  let result = [];
+
+  const permute = (arr, m = []) => {
+    if (arr.length === 0) {
+      result.push(m)
+    } else {
+      for (let i = 0; i < arr.length; i++) {
+        let curr = arr.slice();
+        let next = curr.splice(i, 1);
+        permute(curr.slice(), m.concat(next))
+     }
+   }
+ }
+
+ permute(inputArr)
+
+ return result;
+}
+
+  const ops = cartesian(["+","-","*","/"],["+","-","*","/"],["+","-","*","/"],["+","-","*","/"]);
+  const permNums = permutator(nums);
+    for(const oper in ops){
+        for(const perm in permNums){
+           
+
+let calculation = permNums[perm][0].toString();
+
+const result = permNums[perm].slice(1).reduce((accumulator, number, index) => {
+  const operation = ops[oper][index];
+  let step = `${operation}${number}`;
+  switch (operation) {
+    case "+":
+      accumulator += number;
+      break;
+    case "-":
+      accumulator -= number;
+      break;
+    case "*":
+      accumulator *= number;
+      break;
+    case "/":
+      accumulator /= number;
+      break;
+    default:
+      break;
+  }
+  calculation += step;
+  return accumulator;
+}, permNums[perm][0]);
+
+calculation += `=${result}`;
+
+if (result === target){
+    return calculation
+}
+}
+    
+     }return null;}
+
+      
+      function compute(){
+        var target,nums
+        const inval = document.getElementById("in").value;
+        const targetLen = parseInt(document.getElementById('len').value);
+        const diceNum = parseInt(document.getElementById('dice').value);
+        if (inval.length == targetLen+diceNum) {
+          target = parseInt(inval.slice(0, targetLen));
+          nums = [...inval.slice(targetLen)].map((x) => {
+            return parseInt(x)
+          });
+        }
+        if (inval.length ==targetLen+diceNum){
+            let res = computeWithOperations(target,nums)
+            // console.log(nums)
+            document.getElementById("ans").innerHTML=res?res:"No Solution"
+        }else{
+            document.getElementById("ans").innerHTML=""
+        }
+      }
+      window.addEventListener("keyup", compute)
+    </script>
+  </body>
+</html>
