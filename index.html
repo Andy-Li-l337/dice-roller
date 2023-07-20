@@ -1,5 +1,5 @@
 <html>
-  <head>
+    <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
   <body>
@@ -7,13 +7,15 @@
       <input id="in" type="text" />
       <input type="reset" /><br/>
       <label>Length of Target: </label>
-      <input id="len"/ value="2" type="Number" min="1"><br/>
+      <input id="len" value="2" type="Number" min="1"><br/>
       <label>Number of dice </label>
-      <input id="dice"/ value="5" type="Number" min="1">
+      <input id="dice" value="5" type="Number" min="1"><br/>
+      <label>Digit per dice value: </label>
+      <input id="diceDigit" value="1" type="Number" min="1">
     </form>
     <p id="ans"></p>
     <script>
-     function computeWithOperations(target,nums){
+     function computeWithOperations(target,nums,diceNum){
         const cartesian =
   (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
   const permutator = (inputArr) => {
@@ -35,8 +37,7 @@
 
  return result;
 }
-
-  const ops = cartesian(["+","-","*","/"],["+","-","*","/"],["+","-","*","/"],["+","-","*","/"]);
+  const ops = cartesian(...Array((nums.length)-1).fill(["+","-","*","/"]));
   const permNums = permutator(nums);
     for(const oper in ops){
         for(const perm in permNums){
@@ -82,13 +83,15 @@ if (result === target){
         const inval = document.getElementById("in").value;
         const targetLen = parseInt(document.getElementById('len').value);
         const diceNum = parseInt(document.getElementById('dice').value);
-        if (inval.length == targetLen+diceNum) {
+        const diceDigit = parseInt(document.getElementById('diceDigit').value);
+        if (inval.length == targetLen+(diceNum*diceDigit)) {
           target = parseInt(inval.slice(0, targetLen));
-          nums = [...inval.slice(targetLen)].map((x) => {
+          const reg = new RegExp(`.{1,${diceDigit}}`,"g")
+          nums = [...inval.slice(targetLen).match(reg)].map((x) => {
             return parseInt(x)
           });
         }
-        if (inval.length ==targetLen+diceNum){
+        if (inval.length ==targetLen+(diceNum*diceDigit)){
             let res = computeWithOperations(target,nums)
             // console.log(nums)
             document.getElementById("ans").innerHTML=res?res:"No Solution"
